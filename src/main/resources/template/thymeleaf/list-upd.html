@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>列表</title>
+    <style>
+        .border {
+            border: 1px solid black;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        li {
+            margin-top: 50px;
+        }
+
+        table, td, th {
+            border: 1px solid #616161;
+        }
+
+        a {
+            text-decoration: underline;
+            color: blue;
+            cursor: pointer;
+        }
+    </style>
+    <script th:src="@{/static/jquery-1.8.3.js}"></script>
+</head>
+<body>
+
+<div style="width: 1200px; height: 700px; margin: 0 auto">
+    <div class="border" style="height: 100px">
+        <h2 style="padding: 5px; padding-left: 20px ">学生奖惩管理系统 |欢迎您 <span th:text="${session.user.account}">admin</span>|<a
+                th:href="@{/exit}">注销</a></h2>
+    </div>
+
+    <div style="display: flex;height: 500px;">
+        <div class="border" style="width: 300px">
+            <ul>
+                <li><a th:href="@{/list/student}">学生列表</a></li>
+                <li><a th:href="@{/list/mg}">奖惩管理</a></li>
+                <li><a th:href="@{/exit}">退出系统</a></li>
+            </ul>
+        </div>
+        <div class="border" style="width: 100%;text-align: left;padding-left: 80px;">
+            <h3>奖惩管理-修改</h3>
+            <div>
+                <form th:action="@{/record/upd}" method="post">
+                    <p>奖惩记录名：<br/>
+                        <input type="hidden" th:value="${obj.getId()}" name="id">
+                        <input type="text" name="name" th:value="${obj.getName()}">*<span style="color: red" id="errorNull"></span>
+                    </p>
+                    <p>奖惩对象<br/>
+                        <select name="stuCode">
+                            <option th:value="${obj.getStuCode()}">
+                                [[${sobj.name}]]
+                            </option>
+                        </select>
+                    </p>
+                    <p>描述：<br/>
+                        <textarea style="width: 300px; height: 100px" name="des">[[${obj.des}]]</textarea>
+                    </p>
+                    <p>
+                        <input type="submit" value="保存">&nbsp;&nbsp;<input type="button" value="取消" onclick="javascript:location.href='mg'">
+                    </p>
+                </form>
+                <th:block th:if="${code == 200}"><h3 style="color: green">修改成功！</h3></th:block>
+                <th:block th:if="${code == 500}"><h3 style="color: red">修改错误！</h3></th:block>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    $("form").submit(function () {
+        var name = $("input[name=name]").val().trim();
+        if(name == ""){
+            $("#errorNull").html("记录名不能为空~");
+            return false;
+        }else{
+            $("#errorNull").html("");
+
+        }
+    })
+</script>
+</html>

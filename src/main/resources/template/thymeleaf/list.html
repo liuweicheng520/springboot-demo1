@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>列表</title>
+    <style>
+        .border{
+            border: 1px solid black;
+        }
+        ul{
+            list-style: none;
+        }
+        li{
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+
+<div style="width: 1200px; height: 700px; margin: 0 auto">
+    <div class="border" style="height: 100px">
+        <h2 style="padding: 5px; padding-left: 20px ">学生奖惩管理系统 |欢迎您 <span th:text="${session.user.account}">未登录</span>|<a th:href="@{/exit}">注销</a></h2>
+    </div>
+
+
+    <div style="display: flex;height: 500px;" >
+        <div class="border" style="width: 300px">
+            <ul>
+                <li><a th:href="@{/list/student}">学生列表</a></li>
+                <li><a th:href="@{/list/mg}">奖惩管理</a></li>
+                <li><a th:href="@{/exit}">退出系统</a></li>
+            </ul>
+        </div>
+        <div class="border" style="width: 100%;">
+            <h3>欢迎来到学生奖惩系统</h3>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

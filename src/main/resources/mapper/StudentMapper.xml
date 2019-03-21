@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sy.springbootdemo1.dao.StudentMapper">
+  <resultMap id="BaseResultMap" type="com.sy.springbootdemo1.pojo.Student">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="code" jdbcType="VARCHAR" property="code" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="major" jdbcType="INTEGER" property="major" />
+    <result column="grade" jdbcType="VARCHAR" property="grade" />
+    <result column="sex" jdbcType="INTEGER" property="sex" />
+    <result column="birthday" jdbcType="DATE" property="birthday" />
+    <result column="tel" jdbcType="VARCHAR" property="tel" />
+    <result column="job" jdbcType="INTEGER" property="job" />
+  </resultMap>
+</mapper>

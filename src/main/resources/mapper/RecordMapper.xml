@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sy.springbootdemo1.dao.RecordMapper">
+  <resultMap id="BaseResultMap" type="com.sy.springbootdemo1.pojo.Record">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="stu_code" jdbcType="VARCHAR" property="stuCode" />
+    <result column="create_date" jdbcType="DATE" property="createDate" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+    <result column="des" jdbcType="VARCHAR" property="des" />
+  </resultMap>
+
+  <resultMap id="vo" type="com.sy.springbootdemo1.vo.Vo">
+        <result column="id" property="id"/>
+        <result column="rname" property="recordName"/>
+        <result column="sname" property="studentName"/>
+        <result column="create_date" property="createDate" />
+       <result column="create_by" property="createBy" />
+  </resultMap>
+
+  <select id="queryReocrdAndStudent" resultMap="vo">
+    select record.id as id,student.name as sname , record.name as rname , create_by, create_date from record inner join student on(record.stu_code = student.code)
+    <where>
+        <if test="sname != null">
+            and student.name like "%${sname}%"
+        </if>
+        <if test="rname != null">
+            and record.name like "%${rname}%"
+        </if>
+    </where>
+</select>
+</mapper>

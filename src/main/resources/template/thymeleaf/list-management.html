@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>列表</title>
+    <style>
+        .border {
+            border: 1px solid black;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        li {
+            margin-top: 50px;
+        }
+
+        table, td, th {
+            border: 1px solid #616161;
+        }
+
+        a {
+            text-decoration: underline;
+            color: blue;
+            cursor: pointer;
+        }
+    </style>
+    <script th:src="@{/static/jquery-1.8.3.js}"></script>
+</head>
+<body>
+
+<div style="width: 1200px; height: 700px; margin: 0 auto">
+    <div class="border" style="height: 100px">
+        <h2 style="padding: 5px; padding-left: 20px ">学生奖惩管理系统 |欢迎您 <span th:text="${session.user.account}">admin</span>|<a
+                th:href="@{/exit}">注销</a></h2>
+    </div>
+
+    <div style="display: flex;height: 500px;">
+        <div class="border" style="width: 300px">
+            <ul>
+                <li><a th:href="@{/list/student}">学生列表</a></li>
+                <li><a th:href="@{/list/mg}">奖惩管理</a></li>
+                <li><a th:href="@{/exit}">退出系统</a></li>
+            </ul>
+        </div>
+        <div class="border" style="width: 100%;text-align: center">
+            <h3>奖惩管理</h3>
+            <div>
+                <form th:action="@{/list/getVo}" method="post">
+                    奖惩：<input type="text" th:value="${rname}" id="rname" name="rname">&nbsp;&nbsp;&nbsp;
+                    学生姓名：<input type="text" th:value="${sname}" id="sname" name="sname">
+                    &nbsp;&nbsp;<input type="submit" value="查询">
+                    &nbsp;&nbsp;<input type="button" onclick="javascript:location.href='add'" value="添加">
+                </form>
+            </div>
+            <table style="width: 800px; margin: 40px auto" border="0" cellspacing="0" cellpadding="0">
+                <thead>
+                <tr>
+                    <th>序号</th>
+                    <th>奖惩</th>
+                    <th>学生姓名</th>
+                    <th>创建人</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+
+                <tbody id="stu-tbody">
+                <tr th:each="i,s:${list.list}">
+                    <td th:text="${s.count}"></td>
+                    <td th:text="${i.recordName}"></td>
+                    <td th:text="${i.studentName}"></td>
+                    <td th:text="${i.createBy}"></td>
+                    <td th:text="${#dates.format(i.createDate,'yyyy-MM-dd')}"></td>
+                    <td><a th:href="@{/list/upd(id=${i.id})}">修改</a>&nbsp;&nbsp;<a
+                            th:onclick="|detete(${i.getId()})|">删除</a></td>
+                </tr>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="6">
+                        <p style="margin: 5px">
+                            <a id="firstPage">首页</a> <a id="prePage">上一页</a>
+                            当前页<span id="currentPage"></span>/共<span id="pages"></span>页 <a id="nextPage">下一页</a> <a
+                                id="lastPage">尾页</a></p>
+                    </td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+</body>
+<script th:inline="javascript">
+
+    var pageObj = [[${list}]];
+
+    function refresh() {
+        $("#currentPage").html(pageObj.pageNum);
+        $("#pages").html(pageObj.pages);
+        if (pageObj.hasNextPage) {
+            $("#nextPage").show();
+            $("#lastPage").show();
+        } else {
+            $("#nextPage").hide();
+            $("#lastPage").hide();
+        }
+
+        if (pageObj.hasPreviousPage) {
+            $("#prePage").show();
+            $("#firstPage").show();
+        } else {
+            $("#prePage").hide();
+            $("#firstPage").hide();
+        }
+    }
+
+    refresh();
+
+    $(document).on("click", "#firstPage", function () {
+        pageInfo(1);
+    });
+
+    $(document).on("click", "#lastPage", function () {
+        pageInfo(pageObj.lastPage);
+    });
+    $(document).on("click", "#nextPage", function () {
+        pageInfo(pageObj.nextPage);
+    });
+    $(document).on("click", "#prePage", function () {
+        pageInfo(pageObj.prePage);
+    });
+
+    function pageInfo(num) {
+        var rname = $("#rname").val();
+        var sname = $("#sname").val();
+
+        $.getJSON("/boot-1/list/getVo", {num: num, rname: rname, sname: sname}, function (data) {
+            pageObj = data;
+            if (data.list.length != 0) {
+                $("#stu-tbody").html("");
+                var background_color;
+                $.each(data.list, function (index, item) {
+                    if (index % 2 == 0) {
+                        background_color = "rgb(244,244,244)";
+                    } else {
+                        background_color = "rbg(255,255,255)";
+                    }
+
+                    var tr = "    <tr style='background-color: " + background_color + "'>\n" +
+                        "                    <td>" + (index + 1 + ((num - 1) * 4)) + "</td>\n" +
+                        "                    <td >" + item.recordName + "</td>\n" +
+                        "                    <td>" + item.studentName + "</td>\n" +
+                        "                    <td >" + item.createBy + "</td>\n" +
+                        "                    <td >" + item.createDate + "</td>\n" +
+                        "  <td><a href='upd?id=" + item.id + "'>修改</a>&nbsp;&nbsp;<a onclick='detete(" + item.id + ")'>删除</a></td>" +
+                        "                </tr>";
+                    $("#stu-tbody").append(tr);
+                });
+                refresh();
+
+            }
+        });
+    };
+
+    function detete(id) {
+        if (!confirm("是否要删除？")) {
+            return false;
+        }
+        $.ajax("/boot-1//record/put",
+            {
+                type:"delete",
+                data:{
+                    id:id
+                },
+                dataType:"json",
+                success:function (data) {
+                    if(data.code ==200){
+                        alert("删除成功!");
+                        pageInfo(pageObj.pageNum);
+                    }else{
+                        alert("删除失败");
+                    }
+                }
+
+            }
+        );
+    }
+</script>
+</html>

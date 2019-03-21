@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>列表</title>
+    <style>
+        .border{
+            border: 1px solid black;
+        }
+        ul{
+            list-style: none;
+        }
+        li{
+            margin-top: 50px;
+        }
+        table,td,th{
+            border:  1px solid #616161;
+        }
+        a{
+            text-decoration: underline;
+            color: blue;
+            cursor: pointer;
+        }
+    </style>
+    <script th:src="@{/static/jquery-1.8.3.js}"></script>
+</head>
+<body>
+
+<div style="width: 1200px; height: 800px; margin: 0 auto">
+    <div class="border" style="height: 100px">
+        <h2 style="padding: 5px; padding-left: 20px ">学生奖惩管理系统 |欢迎您 <span th:text="${session.user.account}">admin</span>|<a href="">注销</a></h2>
+    </div>
+
+    <div style="display: flex;height: 100%;" >
+        <div class="border" style="width: 300px">
+            <ul>
+                <li><a th:href="@{/list/student}">学生列表</a></li>
+                <li><a th:href="@{/list/mg}">奖惩管理</a></li>
+                <li><a th:href="@{/exit}">退出系统</a></li>
+            </ul>
+        </div>
+        <div class="border" style="width: 100%; text-align: center">
+            <h3>学生信息</h3>
+            <table style="width: 800px; margin: 40px auto" border="0" cellspacing="0" cellpadding="0">
+                <thead>
+                    <tr>
+                        <th>学号</th>
+                        <th>姓名</th>
+                        <th>职务</th>
+                        <th>专业</th>
+                        <th>班级</th>
+                        <th>性别</th>
+                        <th>生日</th>
+                        <th>电话</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+
+                <tbody id="stu-tbody">
+
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="9">
+                           <p style="margin: 5px">
+                               <a id="firstPage">首页</a> <a id="prePage">上一页</a>
+                               当前页<span id="currentPage"></span>/共<span id="pages"></span>页 <a id="nextPage">下一页</a> <a id="lastPage">尾页</a></p>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <table id="table2" style="width: 800px; margin: 40px auto;display: none" border="0" cellspacing="0" cellpadding="0">
+                <thead>
+                <tr>
+                    <th>序号</th>
+                    <th>奖惩</th>
+                    <th>学号</th>
+                    <th>创建时间</th>
+                    <th>创建人</th>
+                    <th>描述</th>
+                </tr>
+                </thead>
+
+                <tbody id="record-list">
+                <tr>
+                    <td>1</td>
+                    <td>admin</td>
+                    <td>男</td>
+                    <td>2016-6-6</td>
+                    <td>1313000000000</td>
+                </tr>
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+
+    var pageObj={};
+    
+    
+    function refresh() {
+        $("#currentPage").html(pageObj.pageNum);
+        $("#pages").html(pageObj.pages);
+        if(pageObj.hasNextPage){
+            $("#nextPage").show();
+            $("#lastPage").show();
+        }else{
+            $("#nextPage").hide();
+            $("#lastPage").hide();
+        }
+
+        if(pageObj.hasPreviousPage){
+            $("#prePage").show();
+            $("#firstPage").show();
+        }else{
+            $("#prePage").hide();
+            $("#firstPage").hide();
+        }
+    }
+
+
+    $(document).on("click","#firstPage",function () {
+        pageInfo(1);
+    });
+
+    $(document).on("click","#lastPage",function () {
+        pageInfo(pageObj.lastPage);
+    });
+    $(document).on("click","#nextPage",function () {
+        pageInfo(pageObj.nextPage);
+    });
+    $(document).on("click","#prePage",function () {
+        pageInfo(pageObj.prePage);
+    });
+
+    function detatisById(stuCode) {
+        $("#table2").show();
+        $.getJSON("/boot-1/list/getRecord",{stuCode:stuCode},function (data) {
+            $("#record-list").html("");
+            if(data.length != 0){
+                var background_color;
+                $.each(data,function (index,item) {
+                    if(index%2==0){
+                        background_color = "rgb(244,244,244)";
+                    }else{
+                        background_color = "rbg(255,255,255)";
+                    }
+                    var tr="     <tr  style='background-color: "+background_color+"'>" +
+                        "                    <td>"+(index+1)+"</td>\n" +
+                        "                    <td>"+item.name+"</td>\n" +
+                        "                    <td>"+item.stuCode+"</td>\n" +
+                        "                    <td>"+item.createDate+"</td>\n" +
+                        "                    <td>"+item.createBy+"</td>\n" +
+                        "                    <td>"+item.des+"</td>\n" +
+                        "                </tr>";
+
+                    $("#record-list").append(tr);
+                });
+            }else{
+                var tr="<tr><td colspan='6'>无</td></tr>";
+                $("#record-list").append(tr);
+            }
+        })
+    }
+    
+    function pageInfo(num){
+        $.getJSON("/boot-1/list/"+num,{},function (data) {
+            pageObj = data;
+            if(data.list.length!=0){
+                $("#stu-tbody").html("");
+                var background_color;
+
+                var major;
+
+                var sex;
+
+                var job;
+                $.each(data.list,function (index,item) {
+                    if(index%2==0){
+                        background_color = "rgb(244,244,244)";
+                    }else{
+                        background_color = "rbg(255,255,255)";
+                    }
+
+                    if(item.major == 1){
+                        major ="计算机";
+                    }else if(item.major == 2){
+                        major ="金融";
+                    }else{
+                        major="其他";
+                    }
+
+                    sex = item.sex == 1 ? '男':'女';
+
+                    if(item.job == 1){
+                        job ="普通学生"
+                    }else if(item.job == 2){
+                        job="组长";
+                    }else if(item.job == 3){
+                        job="班长";
+                    }
+
+
+
+
+                    var tr=" <tr style='background-color: "+background_color+"'>" +
+                        "                        <td>"+item.code+"</td>\n" +
+                        "                        <td>"+item.name+"</td>\n" +
+                        "                        <td >"+job+"</td>\n" +
+                        "                        <td>"+major+"</td>\n" +
+                        "                        <td>"+item.grade+"</td>\n" +
+                        "                        <td>"+sex+"</td>\n" +
+                        "                        <td>"+item.birthday+"</td>\n" +
+                        "                        <td>"+item.tel+"</td>\n" +
+                        "                        <td><a onclick='detatisById(\""+item.code+"\")'>查看</a></td>\n" +
+                        "                    </tr>";
+
+                    $("#stu-tbody").append(tr);
+                });
+                refresh();
+            }
+        })
+    }
+    pageInfo(1);
+    
+    
+
+
+
+</script>
+</html>
