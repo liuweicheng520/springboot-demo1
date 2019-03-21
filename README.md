@@ -1,2 +1,0 @@
-# shiro
-shiro_code
