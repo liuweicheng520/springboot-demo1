@@ -62,6 +62,7 @@ public class UsersController {
             error = unknownAccountException.getClass().getSimpleName();
         } catch (IncorrectCredentialsException incorrectCredentialsException) {
             error = incorrectCredentialsException.getClass().getSimpleName();
+
         } catch (Exception e) {
             error = e.getClass().getName();
         }
